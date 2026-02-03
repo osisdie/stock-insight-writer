@@ -1,0 +1,111 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Generate Post (Dry Run)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "stock_insight_writer.main",
+            "args": ["generate", "--dry-run", "--ticker", "AAPL"],
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Generate Post (With Ticker)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "stock_insight_writer.main",
+            "args": ["generate", "--ticker", "${input:ticker}"],
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Generate Post (Full Run)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "stock_insight_writer.main",
+            "args": ["generate"],
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Screen Stocks",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "stock_insight_writer.main",
+            "args": ["screen", "--watchlist", "${input:watchlist}"],
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Show Config",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "stock_insight_writer.main",
+            "args": ["config"],
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Debug Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Run Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["tests/", "-v"],
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Attach to Script (--debug)",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "justMyCode": false,
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "${workspaceFolder}"
+                }
+            ]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "ticker",
+            "type": "promptString",
+            "description": "Enter stock ticker (e.g., AAPL, NVDA, MSFT)",
+            "default": "AAPL"
+        },
+        {
+            "id": "watchlist",
+            "type": "promptString",
+            "description": "Enter comma-separated tickers",
+            "default": "AAPL,MSFT,NVDA,META"
+        }
+    ]
+}
