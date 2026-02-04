@@ -20,11 +20,11 @@ class InvestmentPost:
 
     @property
     def filename(self) -> str:
-        """Generate filename in YYYYMMDD_slug-title format (no extension)."""
+        """Generate filename in YYYYMMDD_slug-title.md format."""
         date_str = self.post_date.strftime("%Y%m%d")
         # Create slug from title, limit length
         title_slug = slugify(self.title, max_length=50, word_boundary=True)
-        return f"{date_str}_{title_slug}"
+        return f"{date_str}_{title_slug}.md"
 
     def format_for_export(self) -> str:
         """Format the post in the exact Stock Insight export format."""

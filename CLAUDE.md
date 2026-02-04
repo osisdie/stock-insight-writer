@@ -38,8 +38,8 @@ src/stock_insight_writer/
 
 ## Output Format
 
-Posts are exported to `output/posts/` in this format:
-- Filename: `YYYYMMDD_slug-title` (no extension)
+Posts are exported to `output/stock-posts/` in this format:
+- Filename: `YYYYMMDD_slug-title.md`
 - Content: Title, Date, Tags, and Markdown body with References
 
 ## Known Issues

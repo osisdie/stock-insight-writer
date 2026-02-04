@@ -83,7 +83,7 @@ stock-insight-writer/
 │   └── utils/            # Utilities
 ├── scripts/              # Shell scripts
 ├── tests/                # Test suite
-└── output/posts/         # Generated posts
+└── output/stock-posts/   # Generated posts
 ```
 
 ## Environment Variables
@@ -93,7 +93,7 @@ stock-insight-writer/
 | `OPENROUTER_API_KEY` | Yes | - | Your OpenRouter API key |
 | `OPENROUTER_MODEL` | No | `anthropic/claude-sonnet-4` | LLM model to use |
 | `SLACK_WEBHOOK_URL` | No | - | Slack webhook for notifications |
-| `OUTPUT_DIR` | No | `output/posts` | Output directory for posts |
+| `OUTPUT_DIR` | No | `output/stock-posts` | Output directory for posts |
 | `MIN_PRICE_CHANGE_PCT` | No | `10.0` | Minimum price change % for screening |
 | `MAX_CANDIDATES` | No | `6` | Maximum candidates to analyze |
 
@@ -101,7 +101,7 @@ stock-insight-writer/
 
 Generated posts are saved as text files with the format:
 ```
-YYYYMMDD_slug-title
+YYYYMMDD_slug-title.md
 ```
 
 Each post includes:
