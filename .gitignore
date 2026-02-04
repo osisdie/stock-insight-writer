@@ -50,7 +50,8 @@ Thumbs.db
 coverage/
 .nyc_output/
 output/
-!output/posts/**
+!output/stock-posts/
+!output/stock-posts/**
 
 # Misc
 *.pem

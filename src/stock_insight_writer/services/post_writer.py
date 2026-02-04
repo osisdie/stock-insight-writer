@@ -3,14 +3,17 @@
 from datetime import date
 
 from stock_insight_writer.clients.llm_client import LLMClient
+from stock_insight_writer.config import Language, get_settings
 from stock_insight_writer.models.post import InvestmentPost
 
 
 class PostWriter:
     """Service to generate investment posts using LLM."""
 
-    def __init__(self, llm_client: LLMClient | None = None) -> None:
-        self.llm = llm_client or LLMClient()
+    def __init__(self, llm_client: LLMClient | None = None, language: Language | None = None) -> None:
+        settings = get_settings()
+        self.language = language or settings.language
+        self.llm = llm_client or LLMClient(language=self.language)
 
     def write_post(self, materials: dict) -> InvestmentPost:
         """Generate a complete investment post from gathered materials.

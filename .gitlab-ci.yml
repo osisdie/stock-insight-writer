@@ -1,62 +1,84 @@
 stages:
-  - lint
-  - test
-  - security
-  - build
+  - check      # Static analysis (lint, format, type check)
+  - test       # Unit and integration tests
+  - security   # Vulnerability scanning
+  - build      # Package building
+  - deploy     # Deployment (placeholder)
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PYTHON_VERSION: "3.14.2"
+  PYTHON_VERSION: "3.12"
 
-cache:
-  paths:
-    - .cache/pip
-
-.python-setup:
+default:
   image: python:${PYTHON_VERSION}-slim
+  cache:
+    key: "${CI_JOB_NAME}-${PYTHON_VERSION}"
+    paths:
+      - .cache/pip
+      - .venv/
   before_script:
     - python -m pip install --upgrade pip
 
+# ──────────────────────────────────────────────────────────────
+# Check Stage - Static Analysis
+# ──────────────────────────────────────────────────────────────
 lint:
-  extends: .python-setup
-  stage: lint
+  stage: check
   script:
     - pip install ruff
-    - ruff check .
+    - ruff check . --output-format=gitlab
     - ruff format --check .
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "web"
 
+# ──────────────────────────────────────────────────────────────
+# Test Stage - Unit Tests
+# ──────────────────────────────────────────────────────────────
 test:
-  extends: .python-setup
   stage: test
   needs: [lint]
   script:
     - pip install -e ".[dev]"
-    - pytest tests/ -v --tb=short
+    - pytest tests/ -v --tb=short --junitxml=report.xml
   variables:
     OPENROUTER_API_KEY: "sk-test-dummy-key-for-ci"
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
+    expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "web"
 
-security:
-  extends: .python-setup
+# ──────────────────────────────────────────────────────────────
+# Security Stage - Vulnerability Scanning
+# ──────────────────────────────────────────────────────────────
+dependency-scan:
   stage: security
+  needs: []  # Run in parallel with test
   script:
     - pip install pip-audit
     - pip install -e .
+    - pip-audit --format=json --output=audit.json || true
     - pip-audit --strict || true
+  artifacts:
+    when: always
+    paths:
+      - audit.json
+    expire_in: 1 week
   allow_failure: true
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
+# ──────────────────────────────────────────────────────────────
+# Build Stage - Package Building
+# ──────────────────────────────────────────────────────────────
 build:
-  extends: .python-setup
   stage: build
   needs: [lint, test]
   script:
@@ -68,4 +90,22 @@ build:
     expire_in: 1 week
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_TAG
+
+# ──────────────────────────────────────────────────────────────
+# Deploy Stage - Placeholder for future deployment
+# ──────────────────────────────────────────────────────────────
+.deploy-template:
+  stage: deploy
+  needs: [build]
+  when: manual
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+# Uncomment when ready to deploy to PyPI
+# deploy-pypi:
+#   extends: .deploy-template
+#   script:
+#     - pip install twine
+#     - twine upload dist/* --username __token__ --password $PYPI_TOKEN

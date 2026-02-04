@@ -6,7 +6,7 @@ import typer
 
 from stock_insight_writer.clients.llm_client import LLMClient
 from stock_insight_writer.clients.yahoo_finance import YahooFinanceClient
-from stock_insight_writer.config import get_settings
+from stock_insight_writer.config import Language, get_settings
 from stock_insight_writer.services.data_gatherer import DataGatherer
 from stock_insight_writer.services.post_exporter import PostExporter
 from stock_insight_writer.services.post_writer import PostWriter
@@ -40,11 +40,17 @@ def generate(
         "-w",
         help="Comma-separated list of tickers to screen from",
     ),
+    lang: str | None = typer.Option(
+        None,
+        "--lang",
+        "-l",
+        help="Output language (en or zh-TW)",
+    ),
     output_dir: Path | None = typer.Option(
         None,
         "--output-dir",
         "-o",
-        help="Output directory (default: output/posts)",
+        help="Output directory (default: output/stock-posts)",
     ),
 ) -> None:
     """Generate a daily investment post.
@@ -59,19 +65,29 @@ def generate(
     """
     settings = get_settings()
 
+    # Determine language
+    language = settings.language
+    if lang:
+        try:
+            language = Language(lang)
+        except ValueError:
+            typer.echo(f"❌ Invalid language: {lang}. Use 'en' or 'zh-TW'.")
+            raise typer.Exit(1) from None
+
     # Initialize clients
     yahoo = YahooFinanceClient()
-    llm = LLMClient()
+    llm = LLMClient(language=language)
 
     # Initialize services
     screener = StockScreener(yahoo)
     analyzer = StockAnalyzer(llm)
     gatherer = DataGatherer(yahoo)
-    writer = PostWriter(llm)
+    writer = PostWriter(llm, language=language)
     exporter = PostExporter(output_dir or settings.output_dir)
     notifier = SlackNotifier()
 
-    typer.echo("🔍 Starting stock post generation...")
+    lang_label = "繁體中文" if language == Language.ZH_TW else "English"
+    typer.echo(f"🔍 Starting stock post generation ({lang_label})...")
 
     # Step 1: Get candidates
     if ticker:

@@ -139,7 +139,7 @@ CI runs on:
 
 ## Tech Stack
 
-- **Python 3.14+**
+- **Python 3.12+**
 - **Typer** - CLI framework
 - **Pydantic** - Data validation and settings
 - **yfinance** - Yahoo Finance market data
